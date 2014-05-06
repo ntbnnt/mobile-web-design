@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Find Local Asheville Independant Restaurants</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, user-scalable=no, width=device-width, minimal-ui">
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css">
+        <link rel="stylesheet" href="themes/flair.css" />
+        <link rel="stylesheet" href="styles.css">
+    </head>
+
+    <body>
+	
+<!--/HOME PAGE-->
+        <div data-role="page" id="home" data-theme="a">
+            <div data-role="header" data-position="fixed">
+                <img src="images/flair_map_logo_lg.png" alt="logo" class="logo">
+                <h1 id="mainPageHeader"></h1>
+            </div><!-- /header -->
+
+            <div data-role="content">
+
+                    Search for AIR Restaurants
+
+                        <div 
+						class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
+						data-role="controlgroup"
+						data-filter="true"
+						data-input="#pre-rendered-filterable"
+						data-filter-reveal="true"
+						data-enhanced="true">
+						<!-- HIDDEN LIST OF FILTERED CONTENT -->
+							<div class="ui-controlgroup-controls" id="foodFilter">
+
+							</div>
+						</div>
+                        
+<!-- / Not Hooking into the "area" data...						
+                        <div class="awqsf_box taxodrop-0">
+                            <select id="taxo-0" name="">
+                                <option selected value="wqsftaxoall">Choose a Location</option>
+                                <option value="biltmore-village">Biltmore Village</option>
+                                <option value="downtown">Downtown</option>
+                                <option value="east">East</option>
+                                <option value="north">North</option>
+                                <option value="south">South</option>
+                                <option value="west">West/River Arts</option>
+                            </select>
+                        </div>
+-->
+                        <div class="awqsf_box taxodrop-1">
+                            <select id="taxo-1" >
+                                <option selected value="wqsftaxoall">Type of Food</option>
+                            </select>
+                        </div>
+				<div data-role="collapsible" data-inset="true">
+				<h2>Restaurants</h2>
+                <ul id="listOfRestaurants" data-role="listview">
+                </ul>
+				</div>
+                <div id="featured_restaurant">
+                    <h4>Featured Restaurant</h4>
+                    <!--put an image of food or restaurant here-->
+                <a href="https://tupelohoneycafe.com"><img src="images/tupelofood4.jpg" alt=""></a>
+             </div><!--closes featured restuarant-->
+            
+            </div><!-- /content -->
+
+            <div data-role="footer" data-position="fixed" >
+                <h3><a href="https://airasheville.org"><span class="website_link">AIR Website</span></a></h3>
+                <!--social-icons updated 04/22/14-->
+            <div id="social-icons">
+                <ul class="social_media">
+                    
+                    <li><a href="https://m.facebook.com/airasheville"><img src="images/facebook.png" width="40px" height="40px" alt="Facebook" /></a></li>
+                    <li><a href="https://m.twitter.com/AIRAsheville"><img src="images/twitter.png" width="40px" height="40px" alt="Twitter" /></a></li>
+                </ul>
+            </div><!--Closes Social-Icons-->
+            </div><!-- /footer -->
+        </div><!-- /page -->
+		
+<!-- /DETAIL PAGE -->
+        <div data-role="page" id="detail" data-theme="a">
+            <div data-role="header" data-position="fixed"  data-add-back-btn="true">
+                <h1 id="secondaryHeader"></h1>
+            </div><!-- /header -->
+
+            <div data-role="content">
+                <div id="logo">
+                    <a id="restURL" href=""><img id="restLogo" src=""></a>
+                </div>
+                <div id="description" class="rest_descript">
+                    <p></p>
+                </div>
+              
+                <div id="open" class="days_open"><!--added AC-->
+                    <p></p></div>
+                <div>
+                    <a id="phone" href="" class="ui-btn ui-icon-phone ui-btn-icon-left">Call The Restaurant</a>
+                </div>
+                <div id="map">  
+                    <p><a class="jsMapDir ui-btn ui-icon-info ui-btn-icon-left" target="_blank" ref="">Get Directions</a></p>
+                    <a class="jsMapDir" target="_blank" ref=""><img id="jsMapImage" src=""></a>
+                </div>
+            </div><!-- /content -->
+
+            <div data-role="footer" data-position="fixed">
+                <h4>FLAIR Restaurants</h4>
+            </div><!-- /footer -->
+        </div><!-- /page -->
+
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+		
+<!-- /Populate Details Page --> 
+		<script>
+            $(document).ready(function(){
+                $("#mainPageHeader").text("FLAIR");
+                $("a[data-restaurant]").click(function(e){
+                    var restaurantName = $(this).attr("data-restaurant");
+                    var restaurantDescription = $(this).attr("data-restaurant-description")
+					var logoURL = $(this).attr("data-restaurant-image-url")
+					var restaurantURL = $(this).attr("data-restaurant-url")
+					var restaurantAddress = $(this).attr("data-restaurant-address")
+					var restaurantPhone = $(this).attr("data-restaurant-phone")
+                    
+					var phoneURL = 'tel:' + restaurantPhone;
+                    var restaurantOpen = $(this).attr("data-restaurant-open")
+                    $("#secondaryHeader").text(restaurantName);
+                    $("#description").text(restaurantDescription);
+					$("#restURL").attr('href',restaurantURL);
+					$('#restLogo').attr('src', logoURL);
+					$('#phone').attr('href', phoneURL);
+                    $("#open").text(restaurantOpen);
+		 <!-- /Map Code to pull image and update urls -->
+						if(navigator.geolocation){
+							navigator.geolocation.getCurrentPosition(function(position){
+								var yourPosition = [position.coords.latitude, position.coords.longitude];
+
+								var imageURL = 'http://maps.googleapis.com/maps/api/staticmap?center=' + yourPosition[0] + ',' + yourPosition[1] + '&size=300x300&maptype=roadmap&markers=icon:http://chart.apis.google.com/chart?chst=d_map_pin_icon%26chld=wc-male%257CFFFFFF|' + yourPosition[0] + ',' + yourPosition[1] + '&markers=icon:http://chart.apis.google.com/chart?chst=d_map_pin_icon%26chld=restaurant%257C1bc4de%257Cffffff|' + restaurantAddress + '&sensor=true';
+								var directionsURL = 'https://maps.google.com/maps?saddr=' + yourPosition[0] + ',' + yourPosition[1] + '&daddr=' + restaurantAddress + '&sensor=true';
+
+								$('#jsMapImage').attr('src', imageURL);
+								$('.jsMapDir').attr('href', directionsURL);
+							});
+						};
+				
+                });<!-- /End On Click -->
+								
+            }); <!-- /End Doc Ready -->
+        </script>
+     
+        
+        <!-- OBJECT OF CATEGORIES/TYPES of FOOD -->
+        <script>
+            var $catList = {"categories" : {
+                "american" : "American",
+                "asian" : "Asian",
+                "bakery" : "Bakery",
+                "bars-pubs" : "Bars &amp; Pubs",
+                "bbq-southern" : "BBQ &amp; Southern",
+                "breakfast-brunch" : "Breakfast &amp; Brunch",
+                "brewery" : "Brewery",
+                "burgers-sandwiches" : "Burgers &amp; Sandwiches",
+                "catering" : "Catering",
+                "coffee-dessert" : "Coffee &amp; Dessert",
+                "european" : "European",
+                "farm-to-table" : "Farm to Table",
+                "french" : "French",
+                "gluten-free" : "Gluten Free",
+                "greek" : "Greek",
+                "green" : "Green",
+                "indian" : "Indian",
+                "italian" : "Italian",
+                "latin-america" : "Latin America",
+                "mediterranean" : "Mediterranean",
+                "mexican" : "Mexican",
+                "middle-eastern" : "Middle Eastern",
+                "pizza" : "Pizza",
+                "seafood" : "Seafood",
+                "spanish" : "Spanish",
+                "vegan-vegetarian" : "Vegan &amp; Vegetarian"
+                }
+            };
+        </script>
+ <!-- SCRIPT FOR POPULATING CATEGORIES -->
+        <script>
+            /* fave.js beta by Chris Craven April 8, 2014 */
+			/* updated by Chris Craven April 15, 2014 */
+            $(document).ready(function(){
+
+
+				$( "#foodFilter" ).filterable({ filterReveal: false });
+				$( "#foodFilter" ).filterable( "option", "filterReveal", true );
+                var faveList = getSetFave();
+				
+				faveList.sort(sortFaves);
+				var fave = [];
+				for (var i = 0; i < faveList.length; i++) {
+					fave.push(faveList[i].name)
+				}
+				fave.reverse();
+                console.log('Most Stored Category(fave): ');
+                console.log(fave);
+				$i = 0;
+                //** loop the category list into the HTML using .each **//
+                $.each($catList.categories, function($key, $txt) {
+				
+					
+					// if (fave.length > 0 && $i < fave.length && fave[$i].name == $key) {
+					if ($.inArray($key, fave)>-1) {
+						$('#categoryList').prepend('<li value="'+$key+'"><a href="#">'+$txt+'</a></li>\n');
+                        $('#taxo-1 option:selected').after('<option value="'+$key+'">'+$txt+'</option>\n');     
+						console.log($.inArray($key, fave));
+                    } 
+                    else {
+                        $('#categoryList').append('<li value="'+$key+'"><a href="#">'+$txt+'</a></li>\n');
+                        $('#taxo-1').append('<option value="'+$key+'">'+$txt+'</option>\n');
+						
+						console.log($key);
+                    }
+					
+					$('#foodFilter').append('<a href="detail-'+$key+'" class="ui-screen-hidden ui-link ui-btn ui-icon-carat-r ui-btn-icon-right ui-shadow ui-corner-all" data-role="button" >'+$txt+'</a>');
+                   
+                });
+
+                $('#taxo-1').change(function(){
+                    var selected = $('#taxo-1 option:selected').val();
+                    if (selected != 'wqsftaxoall') getSetFave(selected);
+                    selected = null;
+
+                    // this interferes with user experience of drop down list
+                    //** $(this).val(fave); **//
+                });
+
+                $('#categoryList li').click(function(){
+                    var selected = $(this).attr('value')
+                    //$(this).index(-1);
+                    getSetFave(selected);
+                    //console.log(selected);
+                    selected = null;
+
+                });
+
+            });
+
+            function getSetFave(selected){
+                if (typeof(Storage) == "undefined") return null;
+                if (selected != null) 
+                {
+                    var storedValue = parseInt(localStorage.getItem(selected));
+                    if (storedValue){
+                        localStorage.setItem(selected, String(storedValue + 1));
+                    }
+                    else{
+                        localStorage.setItem(selected, 1);
+                    }
+                };
+			var sortObj = [];
+            var fave;
+            var fVal = 0;
+            for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+                var fKey = localStorage.key(i)
+                var value = parseInt(localStorage.getItem(localStorage.key(i)));
+                // console.log(fKey+" : "+value);
+                // this is where you can do logic
+                // like finding the largest value
+                // and selecting it by default
+                if (fVal < value) {
+                    // console.log("oldFave: "+fVal+" "+fave+" storedval:"+value);
+                    fave = fKey; 
+                    fVal = value;
+                    // console.log("newFave: "+fVal+" "+fave+" storedval:"+value);
+                }
+				sortObj.push({name: fKey, worth: value});
+            };
+			console.log(sortObj);
+			return sortObj;
+            //return fave;
+            };
+			
+			
+			function sortFaves(a,b){
+				return ((a.worth < b.worth) ? -1 : ((a.worth > b.worth) ? 1 : 0));
+			}
+        </script>
+		
+	<!-- Restaurant JSON -->
+		<script>
+		var restList = [{"id":1,"name":"Asheville Pizza \u0026 Brewing Company", "address":"675 Merrimon Avenue", "phone":"828-254-1281", "description":"It’s not just pizza for dinner here. Sure, we were voted Best Pizza In WNC for 7 years in a row, but if you’re just not in the mood for a slice of pie then we have a huge menu of options for you to choose from.","open":"open 7 days","close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":"https://airasheville.org/wp-content/uploads/2013/05/logo-ashevillepizza.png","url":"https://ashevillebrewing.com/"},{"id":13,"name":"Tupelo Honey Caf&eacute - South", "address":"12 College Street asheville nc", "phone":"828-255-4863", "description":"Our food is fresh, made from scratch, sassy and scrumptious. Our cuisine salutes our love of Southern traditions at the table, but like the good people of Asheville, marches to its own drum.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":"https://airasheville.org/wp-content/uploads/2013/05/logo-tupelo.png","url":"https://tupelohoneycafe.com/"},{"id":2,"name":"Creekside Tap House", "address":"8 Beverly Road", "phone":"828-575-2880", "description":"A Neighborhood Joint. Great BBQ, live music, outdoor entertainment while sitting creek side.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":"https://airasheville.org/wp-content/uploads/2013/05/creekside_tap_house.jpg","url":"http://creeksidetaphouse.com/"},{"id":3,"name":"Fig Bistro","description":"FIG Bistro is an intimate neighborhood restaurant featuring New American and French comfort food prepared in the true spirit of Asheville. Our menu features an array of seasonal dishes, along with daily chef’s specials inspired by the fresh local ingredients available here in the Blue Ridge Mountains.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/3.json"},{"id":14,"name":"Village Wayside Bar and Grill","address":"30 Lodge Street","phone":"828-277-4121", "description":"Located in the original 1896 train depot, the Village Wayside brings a little spunk to the Historic Biltmore Village with an eclectic menu, and a thoroughly welcoming environment.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/14.json"},{"id":4,"name":"Homegrown","description":"HomeGrown is dedicated to serving locally grown and produced foods in a comfortable \u0026 inviting Setting. Our menu is loosely American diner, but also loaded with healthy options including vegetarian and gluten-free choices.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/4.json"},{"id":5,"name":"Lobster Trap","description":"Voted best seafood restaurant in Western North Carolina every year since opening in 2005. Located in the heart of downtown, fresh is the name of the game.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/5.json"},{"id":15,"name":"Vinnie's Neighborhood Italian","description":"Classic Pizza, Pasta, and More! Great Atmosphere and Great Prices.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/15.json"},{"id":6,"name":"Luella's Barbecue","description":"Scratch cooking from the garden at its best. Honest good cooking, made with a loving hand.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/6.json"},{"id":7,"name":"Mamacitas","description":"Mamacitas is its own unique blend of Mexican and southern we like to call Dixie-Mex. We like supporting and using local farmed goods to fix fresh, fun and filling food on a family friendly budget.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/7.json"},{"id":16,"name":"Wicked Weed","description":"Wicked Weed is a two storied restaurant and brewery that serves chef inspired, locally sourced food. We specialize in west coast style American ales, open fermented Belgian beers and barrel aged ales. Located next to the Orange Peel in downtown Asheville.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/16.json"},{"id":8,"name":"Mela Indian Restaurant","description":"Mela Indian Restaurant offers authentic North and South Indian dishes as diverse and vibrant as the peoples and regions of India.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/8.json"},{"id":9,"name":"Oysterhouse Brewing","description":"Experience a true neighborhood brewpub in West Asheville. Long time brewer and West Asheville resident Billy Klingel brings his award-winning Oyster House brews home in his recently opened and widely anticipated brewpub. Along with his tasty Oyster House beers you will find an eclectic mix of rotating guest taps, an enticing menu of small plates, a full service bar and an outdoor patio. Taste the real flavor of West Asheville.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/9.json"},{"id":10,"name":"Pomodoros Greek \u0026 Italian Caf&eacute - East","description":"Pomodoros offers an authentic Mediterranean experience in the heart of Western North Carolina.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/10.json"},{"id":11,"name":"Sunny Point Caf&eacute","description":"Local, Southern and Eclectic – if that’s what you’re looking for you’ll find it here. Offering breakfast, lunch and dinner and so much more. Located in the heart of west Asheville our vibrant upbeat cafe will fill your belly, but leave you wanting more! Check out our daytime and dinner specials, local draft beer and a fine selection of wine.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/11.json"},{"id":12,"name":"The Cantina at Biltmore","description":"The Cantina offers handmade Southwestern favorites with a twist of Asheville. Located in the heart of Historic Biltmore Village, it is one of the jewels of the Village and Asheville.","open":null,"close_time":null,"open_time":null,"monday":null,"tuesday":null,"wednesday":null,"thursday":null,"friday":null,"saturday":null,"sunday":null,"image_url":null,"url":"http://127.0.0.1:3000/restaurants/12.json"}]
+		</script>
+
+	<!-- Jquery to populate restaurant list and detail page -->
+		<script>
+		$(restList).each(function(index){
+			$('#listOfRestaurants').append('<li><a href="#detail" data-restaurant="' + this.name + '" data-restaurant-url="' + this.url + '" data-restaurant-address="' + this.address + '" data-restaurant-phone="' + this.phone + '"  data-restaurant-open="' + this.open + '" data-restaurant-image-url="' + this.image_url + '" data-restaurant-description="' + this.description + '">' + this.name + '</a></li>');	
+		});
+		</script>
+
+
+    </body>
+</html>
